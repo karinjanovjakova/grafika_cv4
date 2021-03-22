@@ -485,3 +485,6 @@ void ImageViewer::on_sym_clicked() {
 	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, ui->comboBox_2->currentIndex());
 }
 
+void ImageViewer::on_comboBox_2_currentIndexChanged(int i) {
+	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, i);
+}

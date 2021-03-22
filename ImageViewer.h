@@ -76,4 +76,5 @@ private slots:
 	void on_sym_clicked();
 	void on_sca_clicked();
 	void on_sko_clicked();
+	void on_comboBox_2_currentIndexChanged(int i);
 };
