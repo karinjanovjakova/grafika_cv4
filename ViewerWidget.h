@@ -22,9 +22,11 @@ public:
 	void usecka_DDA(QPoint A, QPoint B, QColor color);
 	void usecka_Bresenham(QPoint A, QPoint B, QColor color);
 	void kruznica(QPoint A, QPoint B, QColor color);
-	void kresliPolygon(QVector <QPoint> body, QColor color, int algo, QColor vypln);
+	void kresliPolygon(QVector <QPoint> body, QColor color, int algo, QColor vypln, int algovypln);
 	void scanLine(QVector <QPoint> body, QColor color);
-	void scanLineTri(QVector <QPoint> body, QColor color);
+	void scanLineTri(QVector <QPoint> body, QColor color, int algovypln);
+	QColor nearest(int x, int y, QVector<QPoint> body);
+	QColor bary(int x, int y, QVector<QPoint> body);
 
 	//Data functions
 	QRgb* getData() { return data; }

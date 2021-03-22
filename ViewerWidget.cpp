@@ -404,7 +404,7 @@ void ViewerWidget::scanLine(QVector <QPoint> body, QColor vypln) {
 		}
 }
 
-void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln) {
+void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln, int algovypln) {
 	//QVector<edge> hrany (3);
 																//usporiadanie pola bodov
 	int i, j, k, y=0, Ymax=0;
@@ -492,7 +492,14 @@ void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln) {
 			int dx = Xmax - Xmin;
 			while (y < Ymax) {														//kreslenie dolneho
 				for (i = 1; i <= dx; i++) {
-					setPixel((int)Xmin + i, y, vypln);
+					if (algovypln==0)					//klasicka vypln
+						setPixel((int)Xmin + i, y, vypln);
+					else if (algovypln == 1) {				//nearest neighbor
+						setPixel((int)Xmin + i, y, nearest(int(Xmin) + i, y, body));
+					}
+					else if (algovypln == 2) {			//barycentric
+						setPixel((int)Xmin + i, y, bary(int(Xmin) + i, y, body));
+					}
 				}
 				Xmin += w3;
 				Xmax += w4;
@@ -500,8 +507,8 @@ void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln) {
 				dx = Xmax - Xmin;
 			}
 
-			Xmin = e1[1].x();														//nastavenie premennych pre horny 
-			Xmax = e2[1].x();
+			Xmin = e1[0].x();														//nastavenie premennych pre horny 
+			Xmax = e2[0].x();
 
 			y = e1[0].y();
 			Ymax = e1[1].y();
@@ -537,15 +544,22 @@ void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln) {
 			int dx = Xmax - Xmin;
 			while (y < Ymax) {														//kreslenie dolneho	
 				for (i = 1; i <= dx; i++) {
-					setPixel(((int)Xmin + i), y, vypln);
+					if (algovypln == 0)					//klasicka vypln
+						setPixel((int)Xmin + i, y, vypln);
+					else if (algovypln == 1) {				//nearest neighbor
+						setPixel((int)Xmin + i, y, nearest(int(Xmin) + i, y, body));
+					}
+					else if (algovypln == 2) {			//barycentric
+						setPixel((int)Xmin + i, y, bary(int(Xmin) + i, y, body));
+					}
 				}
 				Xmin += w3;
 				Xmax += w4;
 				y++;
 				dx = Xmax - Xmin;
 			}
-			Xmin = e1[1].x();														//nastavenie premennych pre horny 
-			Xmax = e2[1].x();
+			Xmin = e1[0].x();														//nastavenie premennych pre horny 
+			Xmax = e2[0].x();
 			y = e1[0].y();
 			Ymax = e1[1].y();
 		}
@@ -554,16 +568,44 @@ void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln) {
 		m = (e2[1].y() - e2[0].y()) / (double)(e2[1].x() - e2[0].x());
 		w2 = 1.0 / m;
 
+
+
 		int dx = Xmax - Xmin;
+		while (y < Ymax) {														//kreslenie dolneho	
+			for (i = 1; i <= dx; i++) {
+				if (algovypln == 0)					//klasicka vypln
+					setPixel((int)Xmin + i, y, vypln);
+				else if (algovypln == 1) {				//nearest neighbor
+					setPixel((int)Xmin + i, y, nearest(int(Xmin) + i, y, body));
+				}
+				else if (algovypln == 2) {			//barycentric
+					setPixel((int)Xmin + i, y, bary(int(Xmin) + i, y, body));
+				}
+			}
+			Xmin += w1;
+			Xmax += w2;
+			y++;
+			dx = Xmax - Xmin;
+		}
+
+
+		/*int dx = Xmax - Xmin;
 		while (y < Ymax) {
 			for (i = 1; i <= dx; i++) {
-				setPixel(((int)Xmin + i), Ymax, vypln);
+				 if (algovypln == 0)					//klasicka vypln
+					setPixel((int)Xmin + i, Ymax, vypln);
+				else if (algovypln == 1) {				//nearest neighbor
+					setPixel((int)Xmin + i, Ymax, nearest(int(Xmin) + i, y, body));
+				}
+				else if (algovypln == 2) {			//barycentric
+
+				}
 			}
 			Xmin += -w1;
 			Xmax += -w2;
 			Ymax--;
 			dx = Xmax - Xmin;
-		}	
+		}	*/
 	}
 	
 	if (ibajeden) {
@@ -575,7 +617,16 @@ void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln) {
 		int dx = Xmax - Xmin;
 		while (y < Ymax) {
 			for (i = 1; i <= dx; i++) {
-				setPixel(((int)Xmin + i), y, vypln);
+				//setPixel(((int)Xmin + i), y, vypln);
+				if (algovypln == 0)					//klasicka vypln
+					setPixel((int)Xmin + i, y, vypln);
+				else if (algovypln == 1) {				//nearest neighbor
+					setPixel((int)Xmin + i, y, nearest(int(Xmin) + i, y, body));
+				}
+				else if (algovypln == 2) {			//barycentric
+					setPixel((int)Xmin + i, y, bary(int(Xmin) + i, y, body));
+
+				}
 			}
 			Xmin += w1;
 			Xmax += w2;
@@ -586,10 +637,46 @@ void ViewerWidget::scanLineTri(QVector <QPoint> body, QColor vypln) {
 }
 
 
+QColor ViewerWidget::nearest(int x, int y, QVector<QPoint> body) {
+	int i, j;
+	QColor c1(255, 0, 0), c2(0, 255, 0), c3(0, 0, 255);
+	float d0, d1, d2;
+	d0 = sqrt((x - body[0].x()) * (x - body[0].x()) + (y - body[0].y()) * (y - body[0].y()));
+	d1 = sqrt((x - body[1].x()) * (x - body[1].x()) + (y - body[1].y()) * (y - body[1].y()));
+	d2 = sqrt((x - body[2].x()) * (x - body[2].x()) + (y - body[2].y()) * (y - body[2].y()));
+
+	if (d0 < d1 && d0 <= d2) {
+		return c1;
+	}
+	else if (d1 < d0 && d1 <= d2) {
+		return c2;
+	}
+	else if (d2 < d0 && d2 <= d1) {
+		return c3;
+	}
+	else {
+		return QColor(0, 0, 0);
+	}
+}
+
+QColor ViewerWidget::bary(int x, int y, QVector<QPoint> body) {
+	float A, A0, A1, L0, L1, L2;
+	QColor bary;
+	A = qAbs((body[1].x() - body[0].x()) * (body[2].y() - body[0].y()) - (body[1].y() - body[0].y()) * (body[2].x() - body[0].x())) / 2.0;
+	A0 = qAbs((body[1].x() - x) * (body[2].y() - y) - (body[1].y() - y) * (body[2].x() - x)) / 2.0;
+	A1 = qAbs((body[0].x() - x) * (body[2].y() - y) - (body[0].y() - y) * (body[2].x() - x)) / 2.0;
+	L0 = A0 / (double)A;
+	L1 = A1 / (double)A;
+	L2 = 1.0 - L1 - L0;
+	bary.setRed(L0 * 255 + L1 * 0 + L2 * 0);
+	bary.setGreen(L0 * 0 + L1 * 255 + L2 * 0);
+	bary.setBlue(L0 * 0 + L1 * 0 + L2 * 255);
+	return bary;
+}
 
 
 
-void ViewerWidget::kresliPolygon(QVector<QPoint> body, QColor color, int algo, QColor vypln) {
+void ViewerWidget::kresliPolygon(QVector<QPoint> body, QColor color, int algo, QColor vypln, int algovypln) {
 	//QPoint A, B;
 	//int i ;
 	clear();
@@ -747,7 +834,7 @@ void ViewerWidget::kresliPolygon(QVector<QPoint> body, QColor color, int algo, Q
 			if (V.size()>3)
 				scanLine(V, vypln);
 			if (V.size() == 3) {
-				scanLineTri(V, vypln);
+				scanLineTri(V, vypln, algovypln);
 			}
 		}
 	update();

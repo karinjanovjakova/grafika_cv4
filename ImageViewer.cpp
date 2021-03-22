@@ -8,6 +8,7 @@ ImageViewer::ImageViewer(QWidget* parent)
 	ui->farba->setStyleSheet("background-color: black");
 	ui->farba2->setStyleSheet("background-color: white");
 	ui->transform->setVisible(false);
+	ui->groupBox_3->setVisible(false);
 }
 
 //ViewerWidget functions
@@ -83,6 +84,7 @@ void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 					poly.push_back(A);
 					poly.push_back(B);
 					ui->transform->setVisible(true);
+					
 					//getCurrentViewerWidget()->kresliPolygon(poly, farba, 0);
 					/*else if (ui->kruznica->isChecked()) {
 						getCurrentViewerWidget()->kruznica(A, B, farba);
@@ -137,6 +139,8 @@ void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 			//getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex());
 			nakreslene = true;
 			ui->transform->setVisible(true);
+			if (poly.size() == 3)
+				ui->groupBox_3->setVisible(true);
 		}
 	}
 	else {
@@ -170,7 +174,7 @@ void ImageViewer::ViewerWidgetMouseMove(ViewerWidget* w, QEvent* event)
 			C.setY(poly[i].y() + dy);
 			temp.push_back(C);
 		}
-		getCurrentViewerWidget()->kresliPolygon(temp, farba, ui->comboBox->currentIndex(),vypln);
+		getCurrentViewerWidget()->kresliPolygon(temp, farba, ui->comboBox->currentIndex(),vypln, ui->comboBox_2->currentIndex());
 	}
 }
 
@@ -197,7 +201,7 @@ void ImageViewer::ViewerWidgetWheel(ViewerWidget* w, QEvent* event)
 			poly[i].setX(x + ((poly[i].x() - x) * coef));
 			poly[i].setY(y + ((poly[i].y() - y) * coef));
 		}
-		getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(),vypln);	
+		getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(),vypln, ui->comboBox_2->currentIndex());
 	}
 }
 
@@ -388,7 +392,7 @@ void ImageViewer::on_color_clicked()
 		ui->farba->setStyleSheet(qss);
 	}
 	if (!poly.isEmpty())
-		getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln);
+		getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, ui->comboBox_2->currentIndex());
 }
 
 void ImageViewer::on_vypln_clicked()
@@ -400,8 +404,10 @@ void ImageViewer::on_vypln_clicked()
 		ui->farba2->setStyleSheet(qss);
 	}
 	if (!poly.isEmpty())
-		getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln);
+		getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, ui->comboBox_2->currentIndex());
+	
 }
+
 
 void ImageViewer::on_Clear_clicked() {
 	nakreslene = false;
@@ -411,6 +417,7 @@ void ImageViewer::on_Clear_clicked() {
 	ui->polygon->setEnabled(true);
 	ui->comboBox->setEnabled(true);
 	ui->transform->setVisible(false);
+	ui->groupBox_3->setVisible(false);
 	clearImage();
 	update();
 }
@@ -435,7 +442,7 @@ void ImageViewer::on_rot_clicked() {
 			poly[i].setY(-a * qSin(uhol * M_PI / 180) + b * qCos(uhol * M_PI / 180) + y);
 		}
 	}
-	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln);
+	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, ui->comboBox_2->currentIndex());
 }
 
 void ImageViewer::on_sca_clicked() {
@@ -444,7 +451,7 @@ void ImageViewer::on_sca_clicked() {
 		poly[i].setX(poly[0].x() + ((poly[i].x() - poly[0].x()) * ui->sca_x->value()));
 		poly[i].setY(poly[0].y() + ((poly[i].y() - poly[0].y()) * ui->sca_y->value()));
 	}
-	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln);
+	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, ui->comboBox_2->currentIndex());
 }
 
 void ImageViewer::on_sko_clicked() {
@@ -455,7 +462,7 @@ void ImageViewer::on_sko_clicked() {
 		poly[i].setY(poly[i].y());
 		//qDebug() << a;
 	}
-	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(),vypln);
+	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(),vypln, ui->comboBox_2->currentIndex());
 }
 
 void ImageViewer::on_sym_clicked() {
@@ -475,6 +482,6 @@ void ImageViewer::on_sym_clicked() {
 	else {									//vertikalna os cez prvy bod
 		poly[1].setX(poly[0].x() - poly[1].x() + poly[0].x());
 	}
-	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln);
+	getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, ui->comboBox_2->currentIndex());
 }
 
