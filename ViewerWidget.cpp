@@ -315,7 +315,7 @@ void ViewerWidget::scanLine(QVector <QPoint> body, QColor vypln) {
 			hrany[i].yk = body[(i + 1) % body.size()].y();
 
 		}
-		else if (body[i].y() != body[(i + 1) % body.size()].y()) {		//touto podmienkou odignoruje hrany so smernicou m=0
+		else  {		//touto podmienkou odignoruje hrany so smernicou m=0
 			hrany[i].xk = body[i].x();
 			hrany[i].xs = body[(i + 1) % body.size()].x();
 			hrany[i].yk = body[i].y();
@@ -329,7 +329,9 @@ void ViewerWidget::scanLine(QVector <QPoint> body, QColor vypln) {
 			hrany[i].w = 0.0;
 		hrany[i].yk += -1;
 		hrany[i].dy = hrany[i].yk - hrany[i].ys;
-		if (hrany[i].dy == 0) {
+	}
+	for (i = 0; i < hrany.size(); i++) {							//vymazanie horizontalnych hran
+		if (hrany[i].dy < 0) {
 			hrany.removeAt(i);
 			i--;
 		}

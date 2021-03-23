@@ -141,6 +141,7 @@ void ImageViewer::ViewerWidgetMouseButtonPress(ViewerWidget* w, QEvent* event)
 			ui->transform->setVisible(true);
 			if (poly.size() == 3)
 				ui->groupBox_3->setVisible(true);
+			getCurrentViewerWidget()->kresliPolygon(poly, farba, ui->comboBox->currentIndex(), vypln, ui->comboBox_2->currentIndex());
 		}
 	}
 	else {
